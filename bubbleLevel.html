@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Bubble Level</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+    <script type="text/javascript" charset="utf-8">
+
+    // The watch id references the current 'watchAcceleration'
+    var watchID = null;
+
+    // Wait for device API libraries to load to prevent errors
+    document.addEventListener("deviceready", onDeviceReady, false);
+
+    // device APIs are available and ready to start the accelerometer and begin checking if device is lying on a flat
+    function onDeviceReady() {
+        startWatch();
+    }
+
+    // start checking the accelerometer values
+    function startWatch() {
+        // Create options object to update properties of accelerometer
+        // Update acceleration every 100 milliseconds
+        var options = { frequency: 100 };
+        watchID = navigator.accelerometer.watchAcceleration(onSuccess, onError, options);
+    }
+
+    // Stop watching the acceleration
+    function stopWatch() {
+        if (watchID) {
+            navigator.accelerometer.clearWatch(watchID);
+            watchID = null;
+        }
+    }
+
+    // onSuccess: check the x and y values of the accelerometer
+    function onSuccess(acceleration) {
+        var element = document.getElementById('accelerometerValue');
+        // element.innerHTML = 'Acceleration X: ' + acceleration.x         + '<br>' +
+        //                     'Acceleration Y: ' + acceleration.y         + '<br>' +
+        //                     'Acceleration Z: ' + acceleration.z         + '<br><br>' +
+        //                     'Timestamp: '      + acceleration.timestamp + '<br>';
+
+        var b = document.getElementById('bd');
+        // if the device is on a flat surface change background colour and display text
+        if((acceleration.y < 0.35 && acceleration.y > -0.35) && (acceleration.x < 0.35 && acceleration.x > -0.35)) {
+            b.style.background = "#1fb91c";
+            element.innerHTML = 'FLAT SURFACE, <br> YAY!';
+        }
+        // if the devide is not on a flat surface start the vibration, change background colour and display text
+        else {
+            b.style.background = "#ff0000";
+            navigator.notification.vibrate(500);
+            element.innerHTML = 'NOT FLAT YET, <br> KEEP TRYING!';
+        }
+    }
+
+    // onError: Failed to get the acceleration
+    function onError() {
+        alert('onError!');
+    }
+
+    </script>
+  </head>
+  <body id="bd">
+        <br><br>
+        <div id="accelerometerValue" class="accelerometer centre">Waiting for accelerometer...</div><br><br><br><br>
+        <a href="index.html"><button class="btns centre">Exit</button></a>
+  </body>
+</html>
